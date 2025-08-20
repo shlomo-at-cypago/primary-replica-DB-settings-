@@ -1,0 +1,43 @@
+version: "3.9"
+
+networks:
+  postgres_network:
+    driver: bridge
+
+volumes:
+  primary_data:
+  archive_data:
+
+services:
+
+  primary:
+    container_name: primary_container
+    build:
+      context: .
+      dockerfile: Dockerfile.primary
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - primary_data:/var/lib/postgresql/data
+      - archive_data:/var/lib/postgresql/archive
+    # This command explicitly clears the data directory before starting the server.
+    # WARNING: This will delete all data on every container start!
+#    command: >
+#      sh -c '
+#      # Check if the data directory exists and is not empty before attempting to clean it.
+#      if [ -n "$(ls -A /var/lib/postgresql/data 2>/dev/null)" ]; then echo "Clearing non-empty data directory..."; rm -rf /var/lib/postgresql/data/*; fi;
+#      # Start the original entrypoint script to handle initialization and server start.
+#      /usr/local/bin/docker-entrypoint.sh'
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped

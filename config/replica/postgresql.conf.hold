@@ -1,0 +1,47 @@
+# CONNECTIONS AND AUTHENTICATION
+listen_addresses = '*'
+max_connections = 1000        # More connections for read replica
+superuser_reserved_connections = 3
+
+# READ REPLICA SETTINGS
+hot_standby = on             # Allow read-only queries during recovery
+max_standby_archive_delay = 30s  # Max delay before canceling queries when reading WAL
+max_standby_streaming_delay = 30s
+wal_receiver_status_interval = 1s
+hot_standby_feedback = on    # Prevent query conflicts with primary
+
+# QUERY TUNING
+random_page_cost = 1.1
+effective_cache_size = '4GB'
+work_mem = '64MB'
+maintenance_work_mem = '256MB'
+
+# LOGGING
+log_destination = 'stderr'
+logging_collector = on
+log_directory = 'log'
+log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'
+log_rotation_age = 1d
+log_rotation_size = 100MB
+log_min_duration_statement = 1000
+
+# REPLICATION
+wal_level = replica
+max_wal_senders = 10
+wal_keep_size = 32
+wal_compression = on
+
+# ERROR REPORTING AND STATISTICS
+log_checkpoints = on
+log_connections = on
+log_disconnections = on
+log_lock_waits = on
+log_temp_files = 0
+track_activities = on
+track_counts = on
+track_io_timing = on
+
+# AUTOVACUUM
+autovacuum = on
+autovacuum_vacuum_scale_factor = 0.1
+autovacuum_analyze_scale_factor = 0.05

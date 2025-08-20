@@ -1,0 +1,36 @@
+version: "3.9"
+
+networks:
+  postgres_network:
+    driver: bridge
+
+volumes:
+  replica_data:
+
+services:
+
+  replica:
+    container_name: replica_container
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-postgres}
+      - PGUSER=postgres
+    volumes:
+      - replica_data:/var/lib/postgresql/data
+    command: >
+      sh -c '
+      until pg_isready -h primary -p 5432; do echo "Waiting for primary database to be ready..."; sleep 2; done;
+      
+      if [ ! -s "/var/lib/postgresql/data/postgresql.conf" ]; then
+        echo "Initializing replica from primary...";
+        gosu postgres pg_basebackup -h primary -D /var/lib/postgresql/data -U replica_user -P -v -R;
+      fi;
+      echo "Starting replica...";
+      gosu postgres postgres'
+    networks:
+      - postgres_network
+    depends_on:
+      primary:
+        condition: service_started
+    restart: unless-stopped

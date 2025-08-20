@@ -1,0 +1,88 @@
+version: "3.9"
+
+networks:
+  postgres_network:
+    driver: bridge
+
+volumes:
+  replica_data:
+  migration_data:
+  archive_data:
+
+services:
+
+  primary:
+    container_name: primary_container
+    build:
+      context: .
+      dockerfile: Dockerfile.primary
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      # Use the default path for the data directory
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      # Use an anonymous volume for the data directory to ensure a clean slate every time
+      - /var/lib/postgresql/data
+      - archive_data:/var/lib/postgresql/archive
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  replica:
+    container_name: replica_container
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-postgres}
+      - PGUSER=postgres
+    volumes:
+      - replica_data:/var/lib/postgresql/data
+    command: >
+      sh -c '
+      until pg_isready -h primary -p 5432; do echo "Waiting for primary database to be ready..."; sleep 2; done;
+      
+      if [ ! -s "/var/lib/postgresql/data/postgresql.conf" ]; then
+        echo "Initializing replica from primary...";
+        gosu postgres pg_basebackup -h primary -D /var/lib/postgresql/data -U replica_user -P -v -R;
+      fi;
+      echo "Starting replica...";
+      gosu postgres postgres'
+    networks:
+      - postgres_network
+    depends_on:
+      primary:
+        condition: service_started
+    restart: unless-stopped
+
+#  migration:
+#    container_name: migration_container
+#    build:
+#      dockerfile: ./Dockerfile
+#      context: .
+#    environment:
+#      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+#      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+#      POSTGRES_ADDR: ${POSTGRES_ADDR:-primary}
+#      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+#      PGSSLMODE: disable
+#    volumes:
+#      - ./migrations:/migrations
+#    command: >
+#      sh -c '
+#      until pg_isready -h $POSTGRES_ADDR -p 5432; do echo "Waiting for $POSTGRES_ADDR to be ready..."; sleep 2; done;
+#      migrate -source file:///migrations -database "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_ADDR/$POSTGRES_DB?sslmode=disable" up'
+#    depends_on:
+#      primary:
+#        condition: service_healthy
+#    networks:
+#      - postgres_network
+#    restart: on-failure:10

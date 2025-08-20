@@ -1,0 +1,34 @@
+version: "3.9"
+
+networks:
+  postgres_network:
+    driver: bridge
+
+volumes:
+  migration_data:
+
+services:
+
+  migration:
+    container_name: migration_container
+    build:
+      dockerfile: Dockerfile.migration
+      context: .
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_ADDR: ${POSTGRES_ADDR:-primary}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      PGSSLMODE: disable
+    volumes:
+      - ./migrations:/migrations
+    command: >
+      sh -c '
+      until pg_isready -h $POSTGRES_ADDR -p 5432; do echo "Waiting for $POSTGRES_ADDR to be ready..."; sleep 2; done;
+      migrate -source file:///migrations -database "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_ADDR/$POSTGRES_DB?sslmode=disable" up'
+    depends_on:
+      primary:
+        condition: service_healthy
+    networks:
+      - postgres_network
+    restart: on-failure:10

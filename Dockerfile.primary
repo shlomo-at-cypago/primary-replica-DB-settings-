@@ -1,0 +1,14 @@
+# Use the official Postgres image as a base
+FROM postgres:15-alpine
+
+# Copy custom configuration files into the correct location
+# The PostgreSQL entrypoint will automatically handle these files
+# upon first-run initialization.
+COPY config/primary/postgresql.conf /var/lib/postgresql/data/
+COPY config/primary/pg_hba.conf /var/lib/postgresql/data/
+
+# Copy the SQL initialization script
+COPY migrations/volumes_scripts/init.sql /docker-entrypoint-initdb.d/
+
+# The PGDATA environment variable is inherited from the base image
+# and correctly set to /var/lib/postgresql/data

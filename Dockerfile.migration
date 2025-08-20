@@ -1,0 +1,14 @@
+# Use the migrate image as a base
+FROM migrate/migrate:latest
+
+# Install the postgresql client to enable connections
+RUN apk add --no-cache postgresql-client
+
+# Copy the migration scripts into the image
+COPY migrations /migrations/
+
+# Set the entrypoint to a shell script that handles the waiting and migration process
+ENTRYPOINT [ "sh", "-c" ]
+
+# The command that will be executed by the entrypoint
+CMD [ "until pg_isready -h $POSTGRES_ADDR -p 5432; do echo 'Waiting for $POSTGRES_ADDR to be ready...'; sleep 2; done; migrate -source file:///migrations -database 'postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_ADDR/$POSTGRES_DB?sslmode=disable' up" ]

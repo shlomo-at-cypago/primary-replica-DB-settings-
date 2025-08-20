@@ -1,0 +1,8 @@
+# Use the official Postgres image as a base
+FROM postgres:15-alpine
+
+# Use an explicit entrypoint script to handle the startup logic
+COPY --chmod=755 ./docker-entrypoint-replica.sh /usr/local/bin/
+
+# The command to be executed by the entrypoint
+CMD ["postgres"]

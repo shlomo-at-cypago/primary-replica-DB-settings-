@@ -1,0 +1,619 @@
+===== PostgreSQL Replication Verification Report =====
+Date: Wed Aug 20 13:14:19 IDT 2025
+
+[1/94] Verifying table: activity_log
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[2/94] Verifying table: activity_log_types
+  ✓ Table structure matches
+  • Primary count: 72 rows
+  • Replica count: 72 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (5/5 rows verified)
+
+[3/94] Verifying table: analysis_result_snapshots
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[4/94] Verifying table: analysis_results
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[5/94] Verifying table: analysis_results_ignore
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[6/94] Verifying table: api_tokens
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[7/94] Verifying table: applications
+  ✓ Table structure matches
+  • Primary count: 4 rows
+  • Replica count: 4 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (4/4 rows verified)
+
+[8/94] Verifying table: asset_snapshots
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[9/94] Verifying table: assets
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[10/94] Verifying table: assets_duplications
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[11/94] Verifying table: assets_ignore_bridge
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[12/94] Verifying table: assets_md
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[13/94] Verifying table: assets_md_requirement_bridge
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[14/94] Verifying table: audit_certificates
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[15/94] Verifying table: audits
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[16/94] Verifying table: audits_controls
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[17/94] Verifying table: audits_controls_audits_ee
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[18/94] Verifying table: audits_controls_framework_controls
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[19/94] Verifying table: audits_controls_risks
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[20/94] Verifying table: audits_ee
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[21/94] Verifying table: audits_ee_snapshots
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[22/94] Verifying table: audits_integrations
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[23/94] Verifying table: audits_snapshots
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[24/94] Verifying table: auxiliary
+  ✓ Table structure matches
+  • Primary count: 41 rows
+  • Replica count: 41 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (5/5 rows verified)
+
+[25/94] Verifying table: certifications
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[26/94] Verifying table: comments
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[27/94] Verifying table: connection_custom_metadata
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[28/94] Verifying table: connections
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[29/94] Verifying table: connector_clusters
+  ✓ Table structure matches
+  • Primary count: 1 rows
+  • Replica count: 1 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (1/1 rows verified)
+
+[30/94] Verifying table: connector_instances
+  ✓ Table structure matches
+  • Primary count: 1 rows
+  • Replica count: 1 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (1/1 rows verified)
+
+[31/94] Verifying table: entities
+  ✓ Table structure matches
+  • Primary count: 1 rows
+  • Replica count: 1 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (1/1 rows verified)
+
+[32/94] Verifying table: entities_frameworks_connections_bridge
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[33/94] Verifying table: findings_snapshots
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[34/94] Verifying table: framework_controls
+  ✓ Table structure matches
+  • Primary count: 2329 rows
+  • Replica count: 2329 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (5/5 rows verified)
+
+[35/94] Verifying table: frameworks
+  ✓ Table structure matches
+  • Primary count: 18 rows
+  • Replica count: 18 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (5/5 rows verified)
+
+[36/94] Verifying table: generated_downloads
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[37/94] Verifying table: generated_downloads_connector_logs_md
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[38/94] Verifying table: generated_downloads_evidence_directory_md
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[39/94] Verifying table: generated_downloads_uar_directory_md
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[40/94] Verifying table: gpt_history
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[41/94] Verifying table: gpt_templates
+  ✓ Table structure matches
+  • Primary count: 98 rows
+  • Replica count: 98 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (5/5 rows verified)
+
+[42/94] Verifying table: integration_command
+  ✓ Table structure matches
+  • Primary count: 15 rows
+  • Replica count: 15 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (5/5 rows verified)
+
+[43/94] Verifying table: integrations
+  ✓ Table structure matches
+  • Primary count: 98 rows
+  • Replica count: 98 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (5/5 rows verified)
+
+[44/94] Verifying table: iso27k1_controls
+  ✓ Table structure matches
+  • Primary count: 114 rows
+  • Replica count: 114 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (5/5 rows verified)
+
+[45/94] Verifying table: itgc_controls
+  ✓ Table structure matches
+  • Primary count: 53 rows
+  • Replica count: 53 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (5/5 rows verified)
+
+[46/94] Verifying table: justifications
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[47/94] Verifying table: management
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[48/94] Verifying table: management_attachments
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[49/94] Verifying table: manual_findings
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[50/94] Verifying table: manual_findings_snapshots
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[51/94] Verifying table: note_snapshots
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[52/94] Verifying table: notes
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[53/94] Verifying table: policies
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[54/94] Verifying table: policies_entities_bridge
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[55/94] Verifying table: policies_templates
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[56/94] Verifying table: push_requirement_change_defaults
+  ✓ Table structure matches
+  • Primary count: 9 rows
+  • Replica count: 9 rows
+  ✓ Row count matches
+  • No primary key found, skipping detailed data verification
+
+[57/94] Verifying table: push_requirement_change_tenant_defaults
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[58/94] Verifying table: risk_matrix
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[59/94] Verifying table: scan_configurations
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[60/94] Verifying table: scan_connections
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[61/94] Verifying table: scan_connections_collectors
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[62/94] Verifying table: scan_errors
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[63/94] Verifying table: scan_errors_assets
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[64/94] Verifying table: scan_info
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[65/94] Verifying table: scans
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[66/94] Verifying table: scheduled_actions
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[67/94] Verifying table: schema_migrations
+  ✓ Table structure matches
+  • Primary count: 1 rows
+  • Replica count: 1 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (1/1 rows verified)
+
+[68/94] Verifying table: soc2_controls
+  ✓ Table structure matches
+  • Primary count: 139 rows
+  • Replica count: 139 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (5/5 rows verified)
+
+[69/94] Verifying table: tasks
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[70/94] Verifying table: tasks_requirements_bridge
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[71/94] Verifying table: tasks_risks_bridge
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[72/94] Verifying table: tasks_uar_entries_bridge
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[73/94] Verifying table: temp_finished_uars_resolve_scan_id
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[74/94] Verifying table: tenants
+  ✓ Table structure matches
+  • Primary count: 1 rows
+  • Replica count: 1 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (1/1 rows verified)
+
+[75/94] Verifying table: tenants_applications
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[76/94] Verifying table: tenants_integrations
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[77/94] Verifying table: universal_controls
+  ✓ Table structure matches
+  • Primary count: 448 rows
+  • Replica count: 448 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (5/5 rows verified)
+
+[78/94] Verifying table: universal_controls_universal_ee
+  ✓ Table structure matches
+  • Primary count: 842 rows
+  • Replica count: 842 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (5/5 rows verified)
+
+[79/94] Verifying table: universal_ee
+  ✓ Table structure matches
+  • Primary count: 750 rows
+  • Replica count: 750 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (5/5 rows verified)
+
+[80/94] Verifying table: universal_ee_asset_types
+  ✓ Table structure matches
+  • Primary count: 809 rows
+  • Replica count: 809 rows
+  ✓ Row count matches
+  • No primary key found, skipping detailed data verification
+
+[81/94] Verifying table: universal_ee_gpt_templates
+  ✓ Table structure matches
+  • Primary count: 106 rows
+  • Replica count: 106 rows
+  ✓ Row count matches
+  • No primary key found, skipping detailed data verification
+
+[82/94] Verifying table: user_access_review
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[83/94] Verifying table: user_access_review_entry
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[84/94] Verifying table: user_access_review_entry_log
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[85/94] Verifying table: user_access_review_entry_reviewer
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[86/94] Verifying table: user_access_review_source_reviewer
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[87/94] Verifying table: user_access_review_source_settings
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[88/94] Verifying table: user_access_reviewers
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[89/94] Verifying table: user_mentions
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[90/94] Verifying table: users_pending_additional_info
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[91/94] Verifying table: users_pending_entities
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[92/94] Verifying table: users_pending_invitation
+  ✓ Table structure matches
+  • Primary count: 0 rows
+  • Replica count: 0 rows
+  ✓ Row count matches
+
+[93/94] Verifying table: workflow_analysis_recipes
+  ✓ Table structure matches
+  • Primary count: 25 rows
+  • Replica count: 25 rows
+  ✓ Row count matches
+  • No primary key found, skipping detailed data verification
+
+[94/94] Verifying table: workflows
+  ✓ Table structure matches
+  • Primary count: 750 rows
+  • Replica count: 750 rows
+  ✓ Row count matches
+  • Verifying sample data using primary keys...
+  ✓ Sample data matches (5/5 rows verified)
+
+===== Summary =====
+Total tables: 94
+Tables with matching structure: 94
+Tables with matching data: 94
+Tables with structure mismatches: 0
+Tables with data mismatches: 0
+
+✅ VERIFICATION SUCCESSFUL: All tables and data have been replicated correctly!

@@ -1,0 +1,8 @@
+# REPLICATION CONNECTION SETTINGS
+primary_conninfo = 'host=primary port=5432 user=postgres password=changeme application_name=replica_container'
+restore_command = 'cp /var/lib/postgresql/archive/%f %p'
+archive_cleanup_command = 'pg_archivecleanup /var/lib/postgresql/archive %r'
+
+# RECOVERY TARGET SETTINGS
+recovery_target_timeline = 'latest'
+standby_mode = 'on'

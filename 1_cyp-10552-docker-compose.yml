@@ -1,0 +1,93 @@
+services:
+  primary:
+    container_name: primary_container
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+      - ${PWD}/migrations/volumes_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ${PWD}/config/primary/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ${PWD}/config/primary/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ${PWD}/config/archive:/var/lib/postgresql/archive
+      - primary_data:/data/postgres
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres_network
+    restart: unless-stopped
+
+  replica:
+    container_name: replica_container
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+      - ${PWD}/migrations/volumes_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ${PWD}/config/replica/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ${PWD}/config/replica/recovery.conf:/var/lib/postgresql/data/recovery.conf
+      - ${PWD}/config/archive:/var/lib/postgresql/archive:ro
+      - replica_data:/var/lib/postgresql/data
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    ports:
+      - "5433:5432"
+    depends_on:
+      - primary
+    networks:
+      - postgres_network
+
+  migration:
+    container_name: migration_container
+    image: migration
+    build:
+      dockerfile: services/backend/deployment/postgres/Dockerfile
+      context: ../../../../
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_ADDR: ${POSTGRES_ADDR:-primary:5432}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      PGSSLMODE: disable
+    volumes:
+      - migration_data:/root/.migration
+    networks:
+      - postgres_network
+    depends_on:
+      - primary
+    restart: on-failure:10
+
+  migration_replica:
+      container_name: migration_replica_container
+      image: migration
+      build:
+        dockerfile: services/backend/deployment/postgres/Dockerfile
+        context: ../../../../
+      environment:
+        POSTGRES_USER: ${POSTGRES_USER:-postgres}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+        POSTGRES_ADDR: ${POSTGRES_ADDR:-replica:5432}
+        POSTGRES_DB: ${POSTGRES_DB:-postgres}
+        PGSSLMODE: disable
+      volumes:
+        - migration_replica_data:/root/.migration
+      networks:
+        - postgres_network
+      depends_on:
+        - replica
+      restart: on-failure:10
+
+volumes:
+  primary_data:
+  replica_data:
+  migration_data:
+  migration_replica_data:
+
+networks:
+  postgres_network:
+    driver: bridge

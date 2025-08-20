@@ -1,0 +1,171 @@
+version: "3.9"
+
+networks:
+  postgres_network:
+    driver: bridge
+
+volumes:
+  primary_data:
+  replica_data:
+  migration_data:
+  archive_data:
+
+services:
+
+  primary:
+    container_name: primary_container
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: changeme
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - ./config/primary/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./config/primary/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./migrations/volumes_scripts:/docker-entrypoint-initdb.d
+      - primary_data:/var/lib/postgresql/data
+      - archive_data:/var/lib/postgresql/archive
+      - ./init-primary.sh:/docker-entrypoint-initdb.d/init-primary.sh
+    entrypoint: [ "/docker-entrypoint-initdb.d/init-primary.sh" ]
+    command: >
+      sh -c "
+        # Create postgres user and group if they don't exist (idempotent)
+        addgroup -g 999 postgres 2>/dev/null || true &&
+        adduser -D -s /bin/bash -u 999 -G postgres postgres 2>/dev/null || true &&
+        
+        # Create necessary directories with proper permissions
+        mkdir -p /var/run/postgresql &&
+        chown -R postgres:postgres /var/run/postgresql &&
+        chown -R postgres:postgres /var/lib/postgresql/data &&
+        
+        # Copy our custom config to the standard PostgreSQL config location
+        cp /etc/postgresql/postgresql.conf /var/lib/postgresql/data/postgresql.conf &&
+        cp /etc/postgresql/pg_hba.conf /var/lib/postgresql/data/pg_hba.conf &&
+        
+        # Debug: List contents of data directory
+        echo '=== DEBUG: Contents of /var/lib/postgresql/data ===' &&
+        ls -la /var/lib/postgresql/data &&
+        echo '=== END DEBUG ===' &&
+        
+        # Check if database already exists with more robust logic
+        if [ -f /var/lib/postgresql/data/PG_VERSION ] && [ -s /var/lib/postgresql/data/PG_VERSION ]; then
+          echo 'Existing database detected (PG_VERSION exists and is not empty), starting PostgreSQL directly...' &&
+          # Database exists, start PostgreSQL directly with our config
+          exec su-exec postgres postgres -c config_file=/var/lib/postgresql/data/postgresql.conf
+        else
+          echo 'Fresh database detected (PG_VERSION does not exist or is empty), running initialization...' &&
+          # For fresh database, switch to postgres user and handle initialization
+          su-exec postgres sh -c '
+            # Create the database structure
+            echo "Running initdb..." &&
+            initdb -D /var/lib/postgresql/data &&
+            echo "initdb completed successfully" &&
+            
+            # Start PostgreSQL temporarily to run init scripts
+            echo "Starting temporary PostgreSQL instance..." &&
+            postgres -D /var/lib/postgresql/data &
+            TEMP_PID=$$! &&
+            
+            # Wait for PostgreSQL to be ready (use TCP/IP connection)
+            echo "Waiting for PostgreSQL to be ready..." &&
+            until pg_isready -h localhost -p 5432 -U postgres; do
+              sleep 1;
+            done &&
+            echo "PostgreSQL is ready" &&
+            
+            # Run our init script
+            echo "Running init script..." &&
+            psql -h localhost -p 5432 -U postgres -d postgres -f /docker-entrypoint-initdb.d/init.sql &&
+            echo "Init script completed" &&
+            
+            # Stop temporary instance
+            echo "Stopping temporary PostgreSQL instance..." &&
+            kill $$TEMP_PID &&
+            wait $$TEMP_PID &&
+            echo "Temporary instance stopped"
+          ' &&
+          
+          # Now start with our custom config
+          echo "Starting PostgreSQL with custom configuration..." &&
+          exec su-exec postgres postgres -c config_file=/var/lib/postgresql/data/postgresql.conf
+        fi
+      "
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -p 5432 -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  replica:
+    container_name: replica_container
+    image: postgres:15-alpine
+    user: root
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: changeme
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - ./config/replica/postgresql.conf:/etc/postgresql/postgresql.conf
+      - replica_data:/var/lib/postgresql/data
+    command: >
+      sh -c "
+        # Fix permissions
+        chown -R postgres:postgres /var/lib/postgresql/data &&
+        chmod 700 /var/lib/postgresql/data &&
+        # Switch to postgres user and wait for primary
+        su-exec postgres sh -c '
+          # Wait for primary to be fully ready (including replicator user)
+          until PGPASSWORD=changeme psql -h primary -U postgres -d postgres -c \"SELECT 1 FROM pg_roles WHERE rolname = '\''replicator'\''\" 2>/dev/null | grep -q 1; do
+            echo Waiting for primary to be ready with replicator user...; sleep 2;
+          done &&
+          if [ ! -s /var/lib/postgresql/data/PG_VERSION ]; then
+            echo Bootstrapping replica via pg_basebackup... &&
+            PGPASSWORD=replicator_pass pg_basebackup -h primary -U replicator -D /var/lib/postgresql/data -Fp -Xs -P -R
+          fi &&
+          exec postgres -c config_file=/etc/postgresql/postgresql.conf
+        '
+      "
+    ports:
+      - "5433:5432"
+    depends_on:
+      primary:
+        condition: service_healthy
+    networks:
+      - postgres_network
+    restart: unless-stopped
+
+  migration:
+    container_name: migration_container
+    image: migration
+    build:
+      dockerfile: services/backend/deployment/postgres/Dockerfile
+      context: ../../../../
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_ADDR: primary
+      POSTGRES_DB: postgres
+      PGSSLMODE: disable
+    volumes:
+      - migration_data:/root/.migration
+      - ./migrations/volumes_scripts:/migrations
+    networks:
+      - postgres_network
+    depends_on:
+      primary:
+        condition: service_healthy
+    entrypoint: ["sh", "-c"]
+    command: >
+      "until PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_ADDR -U $POSTGRES_USER -d $POSTGRES_DB -c '\\q' 2>/dev/null; do
+         echo 'Waiting for primary DB...'; sleep 2;
+       done &&
+       migrate -verbose -source file:///migrations -database \"postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_ADDR/$POSTGRES_DB?sslmode=disable\" up"
+    restart: on-failure:10
