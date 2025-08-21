@@ -1,0 +1,96 @@
+version: "3.9"
+
+networks:
+  postgres_network:
+    driver: bridge
+
+volumes:
+  primary_data:
+  replica_data:
+  migration_data:
+  archive_data:
+
+services:
+
+  primary:
+    container_name: primary_container
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+      - ./config/primary/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./config/primary/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./migrations/volumes_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./config/create_replica_user.sh:/docker-entrypoint-initdb.d/01_create_replica_user.sh
+      - primary_data:/var/lib/postgresql/data
+      - archive_data:/var/lib/postgresql/archive
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf -c hba_file=/etc/postgresql/pg_hba.conf
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  replica:
+    container_name: replica_container
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-postgres}
+      - PGUSER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - replica_data:/var/lib/postgresql/data
+    command: >
+      sh -c '
+      echo "Waiting for primary database to be ready...";
+      until pg_isready -h primary -p 5432; do sleep 2; done;
+      
+      echo "Waiting additional time for replica user to be created...";
+      sleep 10;
+      
+      echo "Force initializing replica from primary...";
+      rm -rf /var/lib/postgresql/data/*;
+      gosu postgres pg_basebackup -h primary -D /var/lib/postgresql/data -U replica_user -X stream -c fast -P -R;
+      echo "Fixing permissions on data directory...";
+      chown -R postgres:postgres /var/lib/postgresql/data;
+      chmod -R 0700 /var/lib/postgresql/data;
+      
+      echo "Starting replica...";
+      gosu postgres postgres -c max_connections=500'
+    ports:
+      - "5433:5432"
+    networks:
+      - postgres_network
+    depends_on:
+      primary:
+        condition: service_healthy
+    restart: unless-stopped
+
+  migration:
+    container_name: migration_container
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_ADDR: ${POSTGRES_ADDR:-primary}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      PGSSLMODE: disable
+    volumes:
+      - ./migrations:/migrations
+    depends_on:
+      primary:
+        condition: service_healthy
+    networks:
+      - postgres_network
+    restart: on-failure:10
